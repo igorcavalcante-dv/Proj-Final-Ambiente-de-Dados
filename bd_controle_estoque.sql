@@ -1,20 +1,25 @@
 create database bd_controle_estoque;
 use bd_controle_estoque;
 
-
 -- -----------------------------------------------------
 -- Modulo 1 - Produtos
 -- -----------------------------------------------------
 
 create table produto(
-idProduto int not null,
+idProduto int not null auto_increment,
 nome varchar(45) not null,
 descricao text null,
 lucro_percentual decimal(5,2) not null default 0,
-unidade_venda varchar(45) not null default 0,
 tamanho varchar(45) null,
 modelo varchar(45) null,
 primary key(idProduto)
+);
+
+create table unidade_venda(
+idunidadevenda int not null,
+tipo varchar(45) not null,
+produto_idproduto int not null,
+primary key(idunidadevenda)
 );
 
 create table caracteristica(
@@ -27,7 +32,7 @@ create table Produto_Has_Caracteristica(
 idProdutoCaracteristica int not null auto_increment,
 Produto_IdProduto int not null,
 Caracteristica_IdCaracteristica int not null,
-valor varchar(45) not null,
+valor decimal(10,2) not null check(valor >= 0),
 primary key(idProdutoCaracteristica)
 );
 
@@ -46,7 +51,7 @@ create table preco(
 idPreco int not null,
 valor decimal(10,2) not null,
 data_inicio date not null,
-data_fim date null default("Sem Vencimento"),
+data_fim date null,
 Produto_IdProduto int not null,
 Usuario_IdUsuario int not null,
 primary key(idPreco)
@@ -60,7 +65,21 @@ create table fornecedor(
 idFornecedor int not null,
 nome varchar(45) not null,
 cnpj varchar(14) not null,
+logradouro varchar(45) not null,
+numero varchar(45) null,
+complemento varchar(45) null,
+bairro varchar(45) null,
+cidade varchar(45) null,
+uf varchar(2) null,
+cep varchar(8) null,
 primary key(idFornecedor)
+);
+
+create table telefone_fornecedor(
+idtelefonefornecedor int not null,
+numero varchar(45) not null,
+fornecedor_idfornecedor int not null,
+primary key(idtelefonefornecedor,fornecedor_idfornecedor)
 );
 
 create table produto_has_fornecedor(
@@ -95,38 +114,23 @@ primary key(idItemCompra)
 
 create table estoque(
 idestoque int not null,
-Itemcompra_idItemCompra int not null,
+itemcompra_idItemCompra int not null,
+produto_idproduto int not null,
 quantidade_recebida int not null,
 quantidade_atual int not null,
 data_validade date null,
 numero_lote varchar(45) null,
-local_armazenamento varchar(45) null,
 primary key(idestoque)
 );
 
--- -----------------------------------------------------
--- Modulo de Apoio - Telefone e Endereço
--- -----------------------------------------------------
-create table telefone(
-numero varchar(45) not null,
-cliente_idcliente int not null,
-fornecedor_idfornecedor int not null,
-primary key(numero,cliente_idcliente,fornecedor_idfornecedor)
+create table local_armazenamento(
+idlocalarmazenamento int not null auto_increment,
+nome varchar(45) not null,
+descricao varchar(100) null,
+estoque_idestoque int not null,
+primary key(idlocalarmazenamento)
 );
 
-create table endereco(
-idEndereco int not null,
-logradouro varchar(45) not null,
-numero varchar(45) null,
-complemento varchar(45) null,
-bairro varchar(45) null,
-cidade varchar(45) null,
-uf varchar(2) null,
-cep varchar(8),
-cliente_idcliente int not null,
-fornecedor_idfornecedor int not null,
-primary key(idEndereco)
-);
 
 -- -----------------------------------------------------
 -- Modulo 5 - Clientes
@@ -138,6 +142,27 @@ nome varchar(45) not null,
 cpf varchar(11) not null,
 email varchar(100) not null,
 primary key(idCliente)
+);
+
+create table telefone_cliente(
+idtelefonecliente int not null,
+numero varchar(45) not null,
+cliente_idcliente int not null,
+primary key(idtelefonecliente,cliente_idcliente)
+);
+
+
+create table endereco(
+idEndereco int not null,
+logradouro varchar(45) not null,
+numero varchar(45) null,
+complemento varchar(45) null,
+bairro varchar(45) null,
+cidade varchar(45) null,
+uf varchar(2) null,
+cep varchar(8),
+cliente_idcliente int not null,
+primary key(idEndereco)
 );
 
 create table produto_favorito(
@@ -154,7 +179,7 @@ primary key(idProdutoFavorito)
 create table vendas(
 idvenda int not null,
 cliente_idcliente int not null,
-vendedor_idvendedor int not null,
+usuario_idusuario int not null,
 data_venda datetime not null,
 primary key(idvenda)
 );
@@ -163,7 +188,7 @@ create table item_venda(
 idItemVenda int not null,
 venda_idvenda int not null,
 produto_idproduto int not null,
-quantidade int not null,
+quantidade int not null check(quantidade > 0),
 preco_unitario decimal(10,2) not null,
 primary key(idItemVenda)
 );
@@ -185,23 +210,52 @@ venda_idvenda int not null,
 transportadora_idtransportadora int not null,
 endereco_idendereco int not null,
 data_envio date null,
-meio_transporte varchar(45) null,
 previsao_entrega date null,
 primary key(identrega)
 );
 
+create table meio_transporte(
+idmeiotransporte int not null,
+descricao varchar(45) null,
+entrega_identrega int not null,
+primary key(idmeiotransporte)
+);
+
 create table rastreamento(
 idRastreamento int not null,
-status varchar(45) null ,
-local varchar(45) not null,
 data_hora datetime not null,
 entrega_identrega int not null,
 primary key(idRastreamento)
 );
 
+create table local(
+idlocal int not null,
+rastreamento_idrastreamento int not null,
+nome varchar(100) not null,
+cidade varchar(45) null,
+uf varchar(2) null,
+primary key(idlocal)
+);
+
+create table status(
+idstatus int not null,
+descricao varchar(45) null ,
+rastreamento_idrastreamento int not null,
+primary key(idstatus)
+);
+
 -- -----------------------------------------------------
 -- Modulo 8 - Criação de FK
 -- -----------------------------------------------------
+
+create index fk_unidade_venda_produto_idx on unidade_venda(produto_idproduto asc);
+
+alter table unidade_venda
+add constraint fk_unidade_venda_produto
+	foreign key(produto_idproduto)
+	references produto(idproduto)
+	on delete no action
+	on update no action;
 
 create index fk_Produto_Has_Caracteristica_produto_idx on Produto_Has_Caracteristica (Produto_IdProduto asc);
 
@@ -279,49 +333,48 @@ add constraint fk_item_has_compra_produto
     on update no action;
 
 create index fk_estoque_item_has_compra_idx on estoque(Itemcompra_idItemCompra asc);
+create index fk_estoque_produto_idx on estoque(produto_idproduto asc);
+
 
 alter table estoque
 add constraint fk_estoque_item_has_compra
 	foreign key(Itemcompra_idItemCompra)
     references item_has_compra (idItemCompra)
     on delete no action
+    on update no action,
+add constraint fk_estoque_produto
+	foreign key(produto_idproduto)
+    references produto (idproduto)
+    on delete no action
     on update no action;
 
-create index fk_telefone_cliente_idx on telefone (cliente_idcliente asc);
+create index fk_telefone_cliente_idx on telefone_cliente(cliente_idcliente asc);
 
-alter table telefone
+alter table telefone_cliente
 add constraint fk_telefone_cliente
 	foreign key(cliente_idcliente)
-    references cliente (idcliente)
-    on delete no action
-    on update no action;
-    
-create index fk_telefone_fornecedor_idx on telefone (fornecedor_idfornecedor asc);
+	references cliente(idcliente)
+	on delete no action
+	on update no action;
 
-alter table telefone
+create index fk_telefone_fornecedor_idx on telefone_fornecedor(fornecedor_idfornecedor asc);
+
+alter table telefone_fornecedor
 add constraint fk_telefone_fornecedor
 	foreign key(fornecedor_idfornecedor)
-    references fornecedor (idfornecedor)
-    on delete no action
-    on update no action;
+	references fornecedor(idfornecedor)
+	on delete no action
+	on update no action;
 
 create index fk_endereco_cliente_idx on endereco (cliente_idcliente asc);
 
-alter table telefone
+alter table endereco
 add constraint fk_endereco_cliente
 	foreign key(cliente_idcliente)
     references cliente (idcliente)
     on delete no action
     on update no action;
     
-create index fk_endereco_fornecedor_idx on endereco (fornecedor_idfornecedor asc);
-
-alter table telefone
-add constraint fk_endereco_fornecedor
-	foreign key(fornecedor_idfornecedor)
-    references fornecedor (idfornecedor)
-    on delete no action
-    on update no action;
 
 create index fk_produto_favorito_cliente_idx on produto_favorito(cliente_idcliente asc);
 create index fk_produto_favorito_produto_idx on produto_favorito(produto_idproduto asc);
@@ -340,7 +393,7 @@ add constraint fk_produto_favorito_produto
 
 create index fk_vendas_cliente_idx on vendas (cliente_idcliente asc);
 
-create index fk_vendas_usuario_idx on vendas (vendedor_idvendedor asc);
+create index fk_vendas_usuario_idx on vendas (usuario_idusuario asc);
 
 alter table vendas
 add constraint fk_vendas_cliente
@@ -349,7 +402,7 @@ add constraint fk_vendas_cliente
     on delete no action
     on update no action,
 add constraint fk_vendas_usuario
-	foreign key(vendedor_idvendedor)
+	foreign key(usuario_idusuario)
 	references usuario(idusuario)
     on delete no action
     on update no action;
@@ -398,5 +451,32 @@ add constraint fk_rastreamento_entrega
     references entrega(identrega)
     on delete no action
     on update no action;
+
+create index fk_meio_transporte_entrega_idx on meio_transporte (entrega_identrega asc);
+alter table meio_transporte
+add constraint fk_meio_transporte_entrega
+	foreign key(entrega_identrega)
+    references entrega(identrega)
+    on delete no action
+    on update no action;
+
+create index fk_status_entrega_idx on status (rastreamento_idrastreamento asc);
+
+alter table status
+add constraint fk_status_entrega
+	foreign key(rastreamento_idrastreamento)
+    references rastreamento (idrastreamento)
+	on delete no action
+    on update no action;
+    
+create index fk_local_rastreamento_idx on local(rastreamento_idrastreamento asc);
+
+alter table local
+add constraint fk_local_rastreamento
+	foreign key(rastreamento_idrastreamento)
+    references rastreamento (idrastreamento)
+    on delete no action
+    on update no action;
+
 
 -- commit;
