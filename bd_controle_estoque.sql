@@ -47,6 +47,15 @@ nome varchar(45) not null,
 primary key(idUsuario)
 );
 
+create table meta_vendedor(
+idMeta int not null auto_increment,
+usuario_idusuario int not null,
+mes int not null,
+ano int not null,
+valor_meta decimal(10,2) not null,
+primary key(idMeta)
+);
+
 create table preco(
 idPreco int not null auto_increment,
 valor decimal(10,2) not null,
@@ -184,6 +193,14 @@ data_venda datetime not null,
 primary key(idvenda)
 );
 
+create table avaliacao(
+idavaliacao int not null auto_increment,
+venda_idvenda int not null,
+nota int not null check(nota between 1 and 5),
+comentario varchar(200) null,
+primary key(idavaliacao)
+);
+
 create table item_venda(
 idItemVenda int not null auto_increment,
 venda_idvenda int not null,
@@ -211,6 +228,8 @@ transportadora_idtransportadora int not null,
 endereco_idendereco int not null,
 data_envio date null,
 previsao_entrega date null,
+recebido_por varchar(100) null,
+entregue tinyint default 0,
 primary key(identrega)
 );
 
@@ -483,6 +502,22 @@ alter table local_armazenamento
 add constraint fk_local_armazenamento
 	foreign key(estoque_idestoque)
     references estoque(idestoque)
+    on delete no action
+    on update no action;
+    
+create index fk_meta_vendedor_usuario_idx on meta_vendedor (usuario_idusuario asc);
+alter table meta_vendedor
+add constraint fk_meta_vendedor_usuario
+	foreign key(usuario_idusuario)
+    references usuario(idusuario)
+    on delete no action
+    on update no action;
+    
+create index fk_avaliacao_venda_idx on avaliacao (venda_idvenda asc);
+alter table avaliacao
+add constraint fk_avaliacao_venda
+	foreign key(venda_idvenda)
+    references vendas(idvenda)
     on delete no action
     on update no action;
 
