@@ -79,7 +79,7 @@ create table telefone_fornecedor(
 idtelefonefornecedor int not null auto_increment,
 numero varchar(45) not null,
 fornecedor_idfornecedor int not null,
-primary key(idtelefonefornecedor,fornecedor_idfornecedor)
+primary key(idtelefonefornecedor)
 );
 
 create table produto_has_fornecedor(
@@ -148,7 +148,7 @@ create table telefone_cliente(
 idtelefonecliente int not null auto_increment,
 numero varchar(45) not null,
 cliente_idcliente int not null,
-primary key(idtelefonecliente,cliente_idcliente)
+primary key(idtelefonecliente)
 );
 
 
