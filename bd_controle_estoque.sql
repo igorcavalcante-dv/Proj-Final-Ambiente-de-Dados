@@ -32,7 +32,7 @@ create table Produto_Has_Caracteristica(
 idProdutoCaracteristica int not null auto_increment,
 Produto_IdProduto int not null,
 Caracteristica_IdCaracteristica int not null,
-valor decimal(10,2) not null check(valor >= 0),
+valor varchar(45) null, -- unidade de medida
 primary key(idProdutoCaracteristica)
 );
 
