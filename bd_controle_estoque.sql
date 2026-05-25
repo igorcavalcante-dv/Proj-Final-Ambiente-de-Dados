@@ -16,14 +16,14 @@ primary key(idProduto)
 );
 
 create table unidade_venda(
-idunidadevenda int not null,
+idunidadevenda int not null auto_increment,
 tipo varchar(45) not null,
 produto_idproduto int not null,
 primary key(idunidadevenda)
 );
 
 create table caracteristica(
-idCaracteristica int not null,
+idCaracteristica int not null auto_increment,
 nome varchar(45) not null,
 primary key(idCaracteristica)
 );
@@ -41,14 +41,14 @@ primary key(idProdutoCaracteristica)
 -- -----------------------------------------------------
 
 create table Usuario(
-idUsuario int not null,
+idUsuario int not null auto_increment,
 matricula varchar(45) unique not null,
 nome varchar(45) not null,
 primary key(idUsuario)
 );
 
 create table preco(
-idPreco int not null,
+idPreco int not null auto_increment,
 valor decimal(10,2) not null,
 data_inicio date not null,
 data_fim date null,
@@ -62,7 +62,7 @@ primary key(idPreco)
 -- -----------------------------------------------------
 
 create table fornecedor(
-idFornecedor int not null,
+idFornecedor int not null auto_increment,
 nome varchar(45) not null,
 cnpj varchar(14) not null,
 logradouro varchar(45) not null,
@@ -76,7 +76,7 @@ primary key(idFornecedor)
 );
 
 create table telefone_fornecedor(
-idtelefonefornecedor int not null,
+idtelefonefornecedor int not null auto_increment,
 numero varchar(45) not null,
 fornecedor_idfornecedor int not null,
 primary key(idtelefonefornecedor,fornecedor_idfornecedor)
@@ -94,7 +94,7 @@ primary key(idProdutoFornecedor)
 -- -----------------------------------------------------
 
 create table compra(
-idcompra int not null,
+idcompra int not null auto_increment,
 fornecedor_idfornecedor int not null,
 data_compra date not null,
 data_pagamento date null,
@@ -113,7 +113,7 @@ primary key(idItemCompra)
 );
 
 create table estoque(
-idestoque int not null,
+idestoque int not null auto_increment,
 itemcompra_idItemCompra int not null,
 produto_idproduto int not null,
 quantidade_recebida int not null,
@@ -137,7 +137,7 @@ primary key(idlocalarmazenamento)
 -- -----------------------------------------------------
 
 create table cliente(
-idCliente int not null,
+idCliente int not null auto_increment,
 nome varchar(45) not null,
 cpf varchar(11) not null,
 email varchar(100) not null,
@@ -145,7 +145,7 @@ primary key(idCliente)
 );
 
 create table telefone_cliente(
-idtelefonecliente int not null,
+idtelefonecliente int not null auto_increment,
 numero varchar(45) not null,
 cliente_idcliente int not null,
 primary key(idtelefonecliente,cliente_idcliente)
@@ -153,7 +153,7 @@ primary key(idtelefonecliente,cliente_idcliente)
 
 
 create table endereco(
-idEndereco int not null,
+idEndereco int not null auto_increment,
 logradouro varchar(45) not null,
 numero varchar(45) null,
 complemento varchar(45) null,
@@ -166,7 +166,7 @@ primary key(idEndereco)
 );
 
 create table produto_favorito(
-idProdutoFavorito int not null,
+idProdutoFavorito int not null auto_increment,
 cliente_idcliente int not null,
 produto_idproduto int not null,
 primary key(idProdutoFavorito)
@@ -177,7 +177,7 @@ primary key(idProdutoFavorito)
 -- -----------------------------------------------------
 
 create table vendas(
-idvenda int not null,
+idvenda int not null auto_increment,
 cliente_idcliente int not null,
 usuario_idusuario int not null,
 data_venda datetime not null,
@@ -185,7 +185,7 @@ primary key(idvenda)
 );
 
 create table item_venda(
-idItemVenda int not null,
+idItemVenda int not null auto_increment,
 venda_idvenda int not null,
 produto_idproduto int not null,
 quantidade int not null check(quantidade > 0),
@@ -198,14 +198,14 @@ primary key(idItemVenda)
 -- -----------------------------------------------------
 
 create table transportadora(
-idtransportadora int not null,
+idtransportadora int not null auto_increment,
 nome varchar(45) not null,
 cnpj varchar(14) not null,
 primary key(idtransportadora)
 );
 
 create table entrega(
-identrega int not null,
+identrega int not null auto_increment,
 venda_idvenda int not null,
 transportadora_idtransportadora int not null,
 endereco_idendereco int not null,
@@ -215,21 +215,21 @@ primary key(identrega)
 );
 
 create table meio_transporte(
-idmeiotransporte int not null,
+idmeiotransporte int not null auto_increment,
 descricao varchar(45) null,
 entrega_identrega int not null,
 primary key(idmeiotransporte)
 );
 
 create table rastreamento(
-idRastreamento int not null,
+idRastreamento int not null auto_increment,
 data_hora datetime not null,
 entrega_identrega int not null,
 primary key(idRastreamento)
 );
 
 create table local(
-idlocal int not null,
+idlocal int not null auto_increment,
 rastreamento_idrastreamento int not null,
 nome varchar(100) not null,
 cidade varchar(45) null,
@@ -238,7 +238,7 @@ primary key(idlocal)
 );
 
 create table status(
-idstatus int not null,
+idstatus int not null auto_increment,
 descricao varchar(45) null ,
 rastreamento_idrastreamento int not null,
 primary key(idstatus)
@@ -478,5 +478,12 @@ add constraint fk_local_rastreamento
     on delete no action
     on update no action;
 
+create index fk_local_armazenamento_idx on local_armazenamento(estoque_idestoque asc);
+alter table local_armazenamento
+add constraint fk_local_armazenamento
+	foreign key(estoque_idestoque)
+    references estoque(idestoque)
+    on delete no action
+    on update no action;
 
 -- commit;
