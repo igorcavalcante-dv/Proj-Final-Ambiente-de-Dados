@@ -40,16 +40,16 @@ primary key(idProdutoCaracteristica)
 -- Modulo 2 - Preços
 -- -----------------------------------------------------
 
-create table Usuario(
-idUsuario int not null auto_increment,
+create table Vendedor(
+idVendedor int not null auto_increment,
 matricula varchar(45) unique not null,
 nome varchar(45) not null,
-primary key(idUsuario)
+primary key(idVendedor)
 );
 
 create table meta_vendedor(
 idMeta int not null auto_increment,
-usuario_idusuario int not null,
+Vendedor_idVendedor int not null,
 mes int not null,
 ano int not null,
 valor_meta decimal(10,2) not null,
@@ -62,7 +62,7 @@ valor decimal(10,2) not null,
 data_inicio date not null,
 data_fim date null,
 Produto_IdProduto int not null,
-Usuario_IdUsuario int not null,
+Vendedor_IdVendedor int not null,
 primary key(idPreco)
 );
 
@@ -188,7 +188,7 @@ primary key(idProdutoFavorito)
 create table vendas(
 idvenda int not null auto_increment,
 cliente_idcliente int not null,
-usuario_idusuario int not null,
+Vendedor_idVendedor int not null,
 data_venda datetime not null,
 primary key(idvenda)
 );
@@ -296,7 +296,7 @@ add constraint fk_Produto_Has_Caracteristica_caracteristica
 
 create index fk_preco_produto_idx on preco (produto_idproduto asc);
 
-create index fk_preco_usuario_idx on preco (usuario_idusuario asc);
+create index fk_preco_Vendedor_idx on preco (Vendedor_idVendedor asc);
 
 alter table preco
 add constraint fk_preco_produto
@@ -304,9 +304,9 @@ add constraint fk_preco_produto
     references produto (idproduto)
     on delete no action
     on update no action,
-add constraint fk_preco_usuario
-	foreign key(usuario_idusuario)
-    references usuario (idusuario)
+add constraint fk_preco_Vendedor
+	foreign key(Vendedor_idVendedor)
+    references Vendedor (idVendedor)
     on delete no action
     on update no action;
 
@@ -412,7 +412,7 @@ add constraint fk_produto_favorito_produto
 
 create index fk_vendas_cliente_idx on vendas (cliente_idcliente asc);
 
-create index fk_vendas_usuario_idx on vendas (usuario_idusuario asc);
+create index fk_vendas_Vendedor_idx on vendas (Vendedor_idVendedor asc);
 
 alter table vendas
 add constraint fk_vendas_cliente
@@ -420,9 +420,9 @@ add constraint fk_vendas_cliente
     references cliente (idcliente)
     on delete no action
     on update no action,
-add constraint fk_vendas_usuario
-	foreign key(usuario_idusuario)
-	references usuario(idusuario)
+add constraint fk_vendas_Vendedor
+	foreign key(Vendedor_idVendedor)
+	references Vendedor(idVendedor)
     on delete no action
     on update no action;
 
@@ -505,11 +505,11 @@ add constraint fk_local_armazenamento
     on delete no action
     on update no action;
     
-create index fk_meta_vendedor_usuario_idx on meta_vendedor (usuario_idusuario asc);
+create index fk_meta_vendedor_Vendedor_idx on meta_vendedor (Vendedor_idVendedor asc);
 alter table meta_vendedor
-add constraint fk_meta_vendedor_usuario
-	foreign key(usuario_idusuario)
-    references usuario(idusuario)
+add constraint fk_meta_vendedor_Vendedor
+	foreign key(Vendedor_idVendedor)
+    references Vendedor(idVendedor)
     on delete no action
     on update no action;
     
